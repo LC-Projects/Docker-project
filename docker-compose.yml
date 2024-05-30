@@ -1,0 +1,50 @@
+name: jonathan-m-docker
+services:
+  apache-php:
+    image: httpd:2.4
+    ports: 
+      - "8080:80"
+    container_name: apache-php
+    volumes:
+      - "source:/usr/local/apache2/htdocs/"
+    depends_on:
+      - bdd
+      
+  bdd:
+    image: mariadb:latest
+    ports:
+      - "3306:3306"
+    container_name: bdd
+    environment:
+      - MARIADB_ROOT_PASSWORD=SecurePassword
+
+  backend:
+    image: bitnami/symfony:latest
+    volumes:
+      - ./src/backend:/app
+    ports:
+      - "8082:8082"
+    environment:
+      - SYMFONY_PROJECT_SKELETON=symfony/skeleton
+      - SYMFONY_DATABASE_PASSWORD=SecurePassword
+    depends_on:
+      - bdd
+
+  frontend:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8083"
+    depends_on:
+      - backend
+    
+volumes:
+  source:
+    driver: local 
+    driver_opts: 
+      type: none 
+      device: "./src" 
+      o: bind
+networks:
+  mysql:
