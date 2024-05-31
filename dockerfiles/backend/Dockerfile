@@ -14,5 +14,7 @@ RUN npm install
 # Copiez les fichiers de l'application dans le conteneur
 COPY . .
 
+EXPOSE 3300
+
 # Exécutez l'application
-CMD ["npm install", "node ace migration:run", "npm run dev"]
+CMD ["node ace migration:run", "npm run dev"]

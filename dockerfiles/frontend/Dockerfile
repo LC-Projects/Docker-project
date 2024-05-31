@@ -18,5 +18,7 @@ COPY . .
 # Change the permissions of the files
 RUN chmod -R 755 /srv/frontend
 
+EXPOSE 8080
+
 # Run the application
-CMD ["npm", "run", "dev"]
+CMD ["npm run dev"]

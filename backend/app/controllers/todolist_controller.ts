@@ -75,15 +75,4 @@ export default class TodolistController {
             code: 200
         })
     }
-    // public async destroy({ params, response }: HttpContext) {
-    //     const todolist = await Todolist.find(params.id);
-    //     if (todolist) {
-    //         await todolist.delete();
-    //         return response.json({ message: 'Data deleted' });
-    //     }
-    //     else
-    //     {
-    //         return response.json({ message: 'No data found' });
-    //     }
-    // }
 }

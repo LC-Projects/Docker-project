@@ -57,7 +57,6 @@ const FormContainer = styled.div`
     }    
 `;
 
-
 const FooterContainer = styled.div`
     grid-area: footer;
     align-items: center;
