@@ -14,6 +14,7 @@ services:
   frontend:
     image: node:alpine
     container_name: frontend_react
+    build: ./dockerfiles/frontend
     ports:
      - 8000:8000
     working_dir: /srv/frontend
@@ -30,6 +31,7 @@ services:
   backend:
     image: node:alpine
     container_name: backend_adonis
+    build: ./dockerfiles/backend
     ports:
       - 3300:3300
     working_dir: /srv/backend
@@ -51,7 +53,7 @@ services:
       - DB_DATABASE=todolist_db
       - DB_PASSWORD=root
       - DB_PORT=3306
-    command: sh -c "npm install && node ace migration:run && npm run dev; tail -f /dev/null"
+    # command: sh -c "npm install && node ace migration:run && npm run dev; tail -f /dev/null"
     depends_on:
       - bdd
 
