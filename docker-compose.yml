@@ -1,50 +1,69 @@
-name: jonathan-m-docker
+name: 'jonathan-martin'
 services:
-  apache-php:
-    image: httpd:2.4
-    ports: 
-      - "8080:80"
-    container_name: apache-php
-    volumes:
-      - "source:/usr/local/apache2/htdocs/"
-    depends_on:
-      - bdd
-      
   bdd:
-    image: mariadb:latest
-    ports:
-      - "3306:3306"
+    image: mariadb
     container_name: bdd
-    environment:
-      - MARIADB_ROOT_PASSWORD=SecurePassword
-
-  backend:
-    image: bitnami/symfony:latest
-    volumes:
-      - ./src/backend:/app
     ports:
-      - "8082:8082"
+      - 3306:3306
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
     environment:
-      - SYMFONY_PROJECT_SKELETON=symfony/skeleton
-      - SYMFONY_DATABASE_PASSWORD=SecurePassword
-    depends_on:
-      - bdd
+      MYSQL_DATABASE: todolist_db
+      MYSQL_ROOT_PASSWORD: root
 
   frontend:
-    build: 
-      context: .
-      dockerfile: Dockerfile
+    image: node:alpine
+    container_name: frontend_react
     ports:
-      - "8083:8083"
+     - 8000:8000
+    working_dir: /srv/frontend
+    volumes:
+      - type: bind
+        source: ./frontend
+        target: /srv/frontend
+      - dist:/srv/frontend/dist
+    tty: true
+    command: sh -c "npm install -g npm && npm install && npm run build && npm run dev; tail -f /dev/null"
     depends_on:
       - backend
-    
+
+  backend:
+    image: node:alpine
+    container_name: backend_adonis
+    ports:
+      - 3300:3300
+    working_dir: /srv/backend
+    volumes:
+      - type: bind
+        source: ./backend
+        target: /srv/backend
+    tty: true
+    environment:
+      - TZ=UTC
+      - PORT=3300
+      - HOST=0.0.0.0
+      - LOG_LEVEL=info
+      - APP_KEY=kBUDZcKZXBI0hh12A0qo1uNo3CAeCmTI
+      - NODE_ENV=development
+      - DB_CONNECTION=mysql
+      - DB_HOST=sql
+      - DB_USER=root
+      - DB_DATABASE=todolist_db
+      - DB_PASSWORD=root
+      - DB_PORT=3306
+    command: sh -c "npm install && node ace migration:run && npm run dev; tail -f /dev/null"
+    depends_on:
+      - bdd
+
+  apache:
+    container_name: apache
+    image: httpd:latest
+    ports:
+      - 80:80
+    volumes:
+      - dist:/usr/local/apache2/htdocs
+    depends_on:
+      - backend
+
 volumes:
-  source:
-    driver: local 
-    driver_opts: 
-      type: none 
-      device: "./src" 
-      o: bind
-networks:
-  mysql:
+  dist:
